@@ -15,27 +15,25 @@ Repository = "https://github.com/joaomdmoura/crewai"
 
 
 [tool.poetry.dependencies]
-python = ">=3.10,<3.13"
-crewai = "^0.100.0"
-crewai-tools = "^0.1.7"
-exa-py = "^1.8.8"
-firecrawl-py = "^1.11.0"
-langchain = "^0.1.10"
-langchain-google-genai = "^2.0.9"
-openai = "^1.13.3"
-scrapfly-sdk = { version = "^0.8.21", extras = ["all"] }
+streamlit = "^1.13.0"
 pysqlite3-binary = "^0.5.1"
-python-dotenv = "1.0.0"
-python-decouple = "^3.6"
+python = ">=3.10,<=3.13"
+pydantic = "^2.4.2"
+langchain = "^0.1.10"
+openai = "^1.13.3"
 opentelemetry-api = "^1.22.0"
 opentelemetry-sdk = "^1.22.0"
 opentelemetry-exporter-otlp-proto-http = "^1.22.0"
+instructor = "^0.5.2"
 regex = "^2023.12.25"
+crewai-tools = { version = "^0.1.7", optional = true }
 click = "^8.1.7"
+python-dotenv = "1.0.0"
 embedchain = "^0.1.98"
 appdirs = "^1.4.4"
-streamlit = "^1.13.0"
-gunicorn = "^20.1.0"  # ✅ Added for production server deployment
+python-decouple = "^3.6"
+crewai = "^0.28.8"
+# ✅ Added for production server deployment
 
 [tool.poetry.extras]
 tools = ["crewai-tools"]
