@@ -3,7 +3,7 @@ from crewai import Crew, Process
 from agents import retrieve_suppliers, domain_researcher_agent, ai_suppliers_writer
 from tasks import retrieve_suppliers_task, domain_and_trustpilot_researcher_task, ai_suppliers_write_task
 from textwrap import dedent
-from decouple import config
+
 class AiSuppliersCrew:
     def __init__(self, inputs):
         self.inputs = inputs
