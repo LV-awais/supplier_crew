@@ -1,16 +1,11 @@
 import asyncio
-import json
-import os
+
 import time
 from crewai.tools import BaseTool
-import requests
-from typing import Type
-from pydantic import BaseModel, Field
-from urllib.parse import urlparse
+
 from dotenv import load_dotenv
 load_dotenv()
 
-from exa_py import Exa
 from scrapfly import ScrapflyClient, ScrapeConfig, ScrapeApiResponse
 # Initialize the Exa tool with your API key
 
