@@ -3,8 +3,9 @@ name = "crewai-28"
 version = "0.28.8"
 description = "AI Suppliers research system using CrewAI"
 authors = ["Your Name <you@example.com>"]
-readme = "README.md"
-package-mode = false
+packages = [
+    { include = "crewai", from = "src" },
+]
 
 [tool.poetry.urls]
 Homepage = "https://crewai.com"
