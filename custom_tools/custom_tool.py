@@ -19,16 +19,10 @@ from scrapfly import ScrapflyClient, ScrapeConfig, ScrapeApiResponse
 
 
 
-import os
-import json
-import requests
-from urllib.parse import urlparse
+
 from crewai.tools import BaseTool
 
-import os
-import json
-import requests
-from urllib.parse import urlparse
+
 
 import json
 import os
