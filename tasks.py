@@ -1,6 +1,6 @@
 from crewai import Task
 from crewai_tools import SerperDevTool
-from custom_tools import CombinedTool
+from customtools.custom_tools import CombinedTool
 from agents import ai_suppliers_writer, domain_researcher_agent, retrieve_suppliers
 
 # Retrieve Suppliers Task
