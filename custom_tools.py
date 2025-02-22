@@ -57,7 +57,7 @@ async def scrape_company(url: str) -> dict:
     response = await scrapfly.async_scrape(ScrapeConfig(url, **BASE_CONFIG))
     return parse_company(response)
 
-class CombinedTool:
+class CombinedTool(BaseTool):
     name: str = "CombinedTool"
     description: str = (
         "Fetches domain age for a list of URLs using the Apivoid API, retrieves Trustpilot review data, "
