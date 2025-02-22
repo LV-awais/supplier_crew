@@ -1,5 +1,5 @@
 from crewai import Agent
-from crewai_tools import SerperDevTool, FirecrawlScrapeWebsiteTool
+from crewai_tools import SerperDevTool
 from tools.custom_tool import  CombinedTool
 
 # AI Suppliers Retriever Agent
