@@ -157,18 +157,19 @@ if search_button:
         inputs = {"topic": user_query.strip(), "country": selected_country }
         research_crew = AiSuppliersCrew(inputs)
         result = research_crew.run()
+        status_container.empty()
+        status_container.markdown("*✅ Research Complete!*", unsafe_allow_html=True)
 
-        # Display results using markdown from the 'raw' key
-       
-        final_report = str(result)
+        # Display the full report directly as markdown
+        st.markdown("### 📌 Results of Supplier Research:")
+        html_text = st.markdown(str(result))
 
-        # Create an empty container for the typewriter effect
+        # Optional typewriter effect for a specific section (e.g., intro)
+        # If you still want it, we can apply it to just the opening text
+
         display_area = st.empty()
-        typed_report = ""
-        header = "### 📌 Results of Supplier Research:\n\n"
+        typed_text = ""
 
-        # Iterate over each character and update display_area to simulate a typewriter effect.
-        for char in final_report:
-            typed_report += char
-            display_area.markdown(header + typed_report, unsafe_allow_html=True)
-            time.sleep(0.05)  # Adjust delay as needed.
+        display_area.markdown(f"### 📌Supplier Research Report:\n\n{html_text}", unsafe_allow_html=True)
+
+        # Then append the rest of the report
