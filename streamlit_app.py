@@ -169,7 +169,7 @@ if search_button:
 
         display_area = st.empty()
         typed_text = ""
-
-        display_area.markdown(f"### 📌Supplier Research Report:\n\n{html_text}", unsafe_allow_html=True)
+        #
+        # display_area.markdown(f"### 📌Supplier Research Report:\n\n{html_text}", unsafe_allow_html=True)
 
         # Then append the rest of the report
