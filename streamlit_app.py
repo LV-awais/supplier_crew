@@ -1,3 +1,5 @@
+import time
+
 __import__('pysqlite3')
 import sys
 sys.modules['sqlite3'] = sys.modules.pop('pysqlite3')
@@ -157,5 +159,16 @@ if search_button:
         result = research_crew.run()
 
         # Display results using markdown from the 'raw' key
-        st.markdown("### 📌 Results of Supplier Research:")
-        st.markdown(result["raw"], unsafe_allow_html=True)
+       
+        final_report = str(result)
+
+        # Create an empty container for the typewriter effect
+        display_area = st.empty()
+        typed_report = ""
+        header = "### 📌 Results of Supplier Research:\n\n"
+
+        # Iterate over each character and update display_area to simulate a typewriter effect.
+        for char in final_report:
+            typed_report += char
+            display_area.markdown(header + typed_report, unsafe_allow_html=True)
+            time.sleep(0.05)  # Adjust delay as needed.
