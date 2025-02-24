@@ -161,11 +161,11 @@ if search_button:
         status_container.markdown("*✅ Research Complete!*", unsafe_allow_html=True)
 
         # Optional: Escape special characters (e.g., dollar signs) to prevent unintended LaTeX rendering.
-        safe_result = result.replace('$', '\\$')
+
 
         # Display the full report directly as markdown.
         st.markdown("### 📌 Results of Supplier Research:")
-        st.markdown(safe_result, unsafe_allow_html=True)
+        status_container.markdown(result, unsafe_allow_html=True)
 
 
         # Optional: Apply typewriter effect to a specific section if needed
