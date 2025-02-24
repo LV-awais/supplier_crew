@@ -162,14 +162,9 @@ if search_button:
 
         # Display the full report directly as markdown
         st.markdown("### 📌 Results of Supplier Research:")
-        html_text = st.markdown(str(result))
+        st.markdown(result, unsafe_allow_html=True)
 
-        # Optional typewriter effect for a specific section (e.g., intro)
-        # If you still want it, we can apply it to just the opening text
-
-        display_area = st.empty()
-        typed_text = ""
-        #
-        display_area.markdown(f"### 📌Supplier Research Report:\n\n{html_text}", unsafe_allow_html=True)
-
-        # Then append the rest of the report
+        # Optional: Apply typewriter effect to a specific section if needed
+        # display_area = st.empty()
+        # display_area.markdown("### 📌 Supplier Research Report:", unsafe_allow_html=True)
+        # Append additional sections as necessary
