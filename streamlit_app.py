@@ -162,7 +162,7 @@ if search_button:
 
         # Display the full report directly as markdown
         st.markdown("### 📌 Results of Supplier Research:")
-        st.markdown(result, unsafe_allow_html=True)
+        st.markdown(result)
 
         # Optional: Apply typewriter effect to a specific section if needed
         # display_area = st.empty()
