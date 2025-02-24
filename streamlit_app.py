@@ -154,15 +154,19 @@ if search_button:
         st.error("⚠ Please enter a valid brand or supplier category.")
     else:
         status_container.markdown("*🔍 Running Supplier Research...*", unsafe_allow_html=True)
-        inputs = {"topic": user_query.strip(), "country": selected_country }
+        inputs = {"topic": user_query.strip(), "country": selected_country}
         research_crew = AiSuppliersCrew(inputs)
         result = research_crew.run()
         status_container.empty()
         status_container.markdown("*✅ Research Complete!*", unsafe_allow_html=True)
 
-        # Display the full report directly as markdown
+        # Optional: Escape special characters (e.g., dollar signs) to prevent unintended LaTeX rendering.
+        safe_result = result.replace('$', '\\$')
+
+        # Display the full report directly as markdown.
         st.markdown("### 📌 Results of Supplier Research:")
-        st.markdown(result)
+        st.markdown(safe_result, unsafe_allow_html=True)
+
 
         # Optional: Apply typewriter effect to a specific section if needed
         # display_area = st.empty()
