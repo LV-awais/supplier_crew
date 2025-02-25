@@ -1,5 +1,4 @@
 import time
-
 __import__('pysqlite3')
 import sys
 sys.modules['sqlite3'] = sys.modules.pop('pysqlite3')
@@ -7,7 +6,19 @@ import os
 import streamlit as st
 from main import AiSuppliersCrew
 
+# ---------------------------
+# Initialize session state variables if they don't exist
+# ---------------------------
+if "research_done" not in st.session_state:
+    st.session_state.research_done = False
+if "result" not in st.session_state:
+    st.session_state.result = ""
+if "inputs" not in st.session_state:
+    st.session_state.inputs = {}
+
+# ---------------------------
 # Set up base directory and logo path
+# ---------------------------
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 logo_url = os.path.join(BASE_DIR, "search.jpg")
 
@@ -19,7 +30,9 @@ os.environ["SERPER_API_KEY"] = st.secrets["SERPER_API_KEY"]
 os.environ["SCRAPFLY_API_KEY"] = st.secrets["SCRAPFLY_API_KEY"]
 os.environ["APIVOID_API_KEY"] = st.secrets["APIVOID_API_KEY"]
 
+# ---------------------------
 # Set page config with a custom logo and title
+# ---------------------------
 st.set_page_config(page_title="Supplier Acquisition Tool", layout="wide", page_icon=logo_url)
 
 # ---------------------------
@@ -28,14 +41,12 @@ st.set_page_config(page_title="Supplier Acquisition Tool", layout="wide", page_i
 st.markdown(
     """
     <style>
-        /* Global container tweaks */
         .block-container { 
             padding-top: 2rem; 
             padding-bottom: 2rem; 
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             color: #333;
         }
-        /* Custom header styling */
         .custom-header {
             background: linear-gradient(90deg, #1a73e8, #4285f4);
             padding: 1rem;
@@ -50,7 +61,6 @@ st.markdown(
             font-size: 2.5rem;
             font-weight: 600;
         }
-        /* Sidebar enhancements */
         .sidebar .sidebar-content {
             font-family: 'Segoe UI', sans-serif;
         }
@@ -60,7 +70,6 @@ st.markdown(
             color: #1a73e8; 
             margin-bottom: 10px;
         }
-        /* Button styling */
         .stButton button {
             background-color: #1a73e8;
             color: #fff;
@@ -73,7 +82,6 @@ st.markdown(
         .stButton button:hover {
             background-color: #135ab6;
         }
-        /* Final Answer Box styling */
         .final-answer-box {
             border: 1px solid #ddd;
             padding: 20px;
@@ -103,9 +111,9 @@ with col2:
 st.sidebar.markdown("<div class='sidebar-header'>Enter Your Search Criteria</div>", unsafe_allow_html=True)
 user_query = st.sidebar.text_area("Brand Name", placeholder="Enter the brand or supplier category", height=80)
 
-# Full list of countries (alphabetically sorted for ease-of-use)
+# Full list of countries (alphabetically sorted)
 all_countries = sorted([
-    # 🌍 Africa
+    # Africa
     "Algeria", "Angola", "Benin", "Botswana", "Burkina Faso", "Burundi", "Cape Verde",
     "Cameroon", "Central African Republic", "Chad", "Comoros", "Congo", "Democratic Republic of the Congo",
     "Djibouti", "Egypt", "Equatorial Guinea", "Eritrea", "Eswatini", "Ethiopia", "Gabon", "Gambia", "Ghana",
@@ -114,14 +122,14 @@ all_countries = sorted([
     "Sao Tome and Principe", "Senegal", "Seychelles", "Sierra Leone", "Somalia", "South Africa", "South Sudan",
     "Sudan", "Tanzania", "Togo", "Tunisia", "Uganda", "Zambia", "Zimbabwe",
 
-    # 🌎 Americas
+    # Americas
     "Antigua and Barbuda", "Argentina", "Bahamas", "Barbados", "Belize", "Bolivia", "Brazil", "Canada",
     "Chile", "Colombia", "Costa Rica", "Cuba", "Dominica", "Dominican Republic", "Ecuador", "El Salvador",
     "Grenada", "Guatemala", "Guyana", "Haiti", "Honduras", "Jamaica", "Mexico", "Nicaragua", "Panama",
     "Paraguay", "Peru", "Saint Kitts and Nevis", "Saint Lucia", "Saint Vincent and the Grenadines",
     "Suriname", "Trinidad and Tobago", "United States", "Uruguay", "Venezuela",
 
-    # 🌏 Asia
+    # Asia
     "Afghanistan", "Armenia", "Azerbaijan", "Bahrain", "Bangladesh", "Bhutan", "Brunei", "Cambodia",
     "China", "Cyprus", "Georgia", "India", "Indonesia", "Iran", "Iraq", "Israel", "Japan", "Jordan",
     "Kazakhstan", "Kuwait", "Kyrgyzstan", "Laos", "Lebanon", "Malaysia", "Maldives", "Mongolia",
@@ -129,7 +137,7 @@ all_countries = sorted([
     "Saudi Arabia", "Singapore", "South Korea", "Sri Lanka", "Syria", "Taiwan", "Tajikistan", "Thailand",
     "Timor-Leste", "Turkey", "Turkmenistan", "United Arab Emirates", "Uzbekistan", "Vietnam", "Yemen",
 
-    # 🌍 Europe
+    # Europe
     "Albania", "Andorra", "Austria", "Belarus", "Belgium", "Bosnia and Herzegovina", "Bulgaria",
     "Croatia", "Czech Republic", "Denmark", "Estonia", "Finland", "France", "Germany", "Greece",
     "Hungary", "Iceland", "Ireland", "Italy", "Kosovo", "Latvia", "Liechtenstein", "Lithuania",
@@ -137,7 +145,7 @@ all_countries = sorted([
     "Norway", "Poland", "Portugal", "Romania", "Russia", "San Marino", "Serbia", "Slovakia",
     "Slovenia", "Spain", "Sweden", "Switzerland", "Ukraine", "United Kingdom", "Vatican City",
 
-    # 🌏 Oceania
+    # Oceania
     "Australia", "Fiji", "Kiribati", "Marshall Islands", "Micronesia", "Nauru", "New Zealand",
     "Palau", "Papua New Guinea", "Samoa", "Solomon Islands", "Tonga", "Tuvalu", "Vanuatu"
 ])
@@ -153,22 +161,19 @@ if search_button:
     if not user_query.strip():
         st.error("⚠ Please enter a valid brand or supplier category.")
     else:
+        # Provide immediate feedback to the user
         status_container.markdown("*🔍 Running Supplier Research...*", unsafe_allow_html=True)
-        inputs = {"topic": user_query.strip(), "country": selected_country}
-        research_crew = AiSuppliersCrew(inputs)
-        result = research_crew.run()
+        # Store the inputs in session state for persistence
+        st.session_state.inputs = {"topic": user_query.strip(), "country": selected_country}
+        # Run the research process and store the result in session state
+        research_crew = AiSuppliersCrew(st.session_state.inputs)
+        st.session_state.result = research_crew.run()
+        st.session_state.research_done = True
+        # Clear the status container and indicate completion
         status_container.empty()
         status_container.markdown("*✅ Research Complete!*", unsafe_allow_html=True)
 
-        # Optional: Escape special characters (e.g., dollar signs) to prevent unintended LaTeX rendering.
-
-
-        # Display the full report directly as markdown.
-        st.markdown("### 📌 Results of Supplier Research:")
-        status_container.markdown(result, unsafe_allow_html=True)
-
-
-        # Optional: Apply typewriter effect to a specific section if needed
-        # display_area = st.empty()
-        # display_area.markdown("### 📌 Supplier Research Report:", unsafe_allow_html=True)
-        # Append additional sections as necessary
+# If research has been completed, display the results
+if st.session_state.research_done:
+    st.markdown("### 📌 Results of Supplier Research:")
+    st.markdown(st.session_state.result, unsafe_allow_html=True)
