@@ -175,4 +175,4 @@ if search_button:
 # If research has been completed, display the results
 if st.session_state.research_done:
     st.markdown("### 📌 Results of Supplier Research:")
-    st.markdown(str(st.session_state.result), unsafe_allow_html=True,*,help=None)
+    st.markdown(str(st.session_state.result), unsafe_allow_html=True,help=None)
