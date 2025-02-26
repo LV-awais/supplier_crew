@@ -1,5 +1,7 @@
 from crewai import Agent
-from customtools.custom_tools import  CombinedTool,SerperSearchTool
+from crewai_tools.tools.serper_dev_tool.serper_dev_tool import SerperDevTool
+
+from customtools.custom_tools import  CombinedTool
 
 # AI Suppliers Retriever Agent
 retrieve_suppliers = Agent(
@@ -14,7 +16,7 @@ retrieve_suppliers = Agent(
     allow_delegation=True,
     verbose=True,
     llm="gemini/gemini-2.0-flash",
-    tools=[SerperSearchTool()]  # Uses Serper for search
+    tools=[SerperDevTool()]  # Uses Serper for search
 )
 
 # Domain Researcher Agent
