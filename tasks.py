@@ -8,9 +8,9 @@ retrieve_suppliers_task = Task(
     description=(
         "Use the Serper tool to search for suppliers related to the input topic. "
         "Execute multiple search queries using the input topic, for example:\n"
-        "- '{topic} reliable, potentials, top-rated potential distributors {country}'\n"
-        "- '{topic} reliable, potentials, top-rated suppliers {country}'\n"
-        "- '{topic} reliable, potentials, top-rated resellers {country}'\n"
+        "- '{topic} reliable, potentials, top-rated potential wholesale distributors {country}'\n"
+        "- '{topic} reliable, potentials, top-rated wholesale suppliers {country}'\n"
+        "- '{topic} reliable, potentials, top-rated wholesale retailers {country}'\n"
         "Aggregate the results into a structured dataset including:\n"
         "- **Supplier name and description except 'Amazon'**\n"
         "- **Main website link**\n"
