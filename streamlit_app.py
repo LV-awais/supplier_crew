@@ -1,11 +1,10 @@
-import time
 __import__('pysqlite3')
 import sys
 sys.modules['sqlite3'] = sys.modules.pop('pysqlite3')
 import os
 import streamlit as st
 from main import AiSuppliersCrew
-
+import time
 # ---------------------------
 # Initialize session state variables if they don't exist
 # ---------------------------
@@ -175,5 +174,5 @@ if search_button:
 
 # If research has been completed, display the results
 if st.session_state.research_done:
-    status_container.markdown("### 📌 Results of Supplier Research:")
-    status_container.markdown(st.session_state.result, unsafe_allow_html=True)
+    st.markdown("### 📌 Results of Supplier Research:")
+    st.markdown(str(st.session_state.result), unsafe_allow_html=True,*,help=None)

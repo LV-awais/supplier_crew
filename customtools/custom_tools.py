@@ -17,7 +17,7 @@ import requests
 import os
 import json
 import requests
-from crewai_tools import BaseTool
+from crewai.tools import BaseTool
 
 
 class SerperSearchTool(BaseTool):
