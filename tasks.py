@@ -4,6 +4,11 @@ from customtools.custom_tools import CombinedTool,SerperSearchTool
 from agents import ai_suppliers_writer, domain_researcher_agent, retrieve_suppliers
 
 # Retrieve Suppliers Task
+from crewai import Task
+from agents import retrieve_suppliers
+from customtools.custom_tools import SerperSearchTool  # Import updated tool
+
+# Updated Retrieve Suppliers Task
 retrieve_suppliers_task = Task(
     description=(
         "Use the Serper tool to search for **verified suppliers** related to the input topic.\n"
@@ -17,7 +22,7 @@ retrieve_suppliers_task = Task(
         "- '{topic} wholesale suppliers, industrial providers {country}'\n"
         "\n"
         "Filter and aggregate the results into a structured dataset including:\n"
-        "- **Supplier name (excluding 'Amazon' or other non-suppliers)**\n"
+        "- **Supplier name (excluding 'Amazon' or other non-suppliers like Reddit,Quora and other forums like research paper)**\n"
         "- **Official website link**\n"
         "- **Relevant metadata like location, industry, and verification badges (if available)**"
     ),
@@ -29,23 +34,25 @@ retrieve_suppliers_task = Task(
         "- `metadata` (if available)."
     ),
     agent=retrieve_suppliers,  # Uses AI Suppliers Retriever agent
-    tools=[SerperSearchTool()]  # Uses Serper for searching suppliers
+    tools=[SerperSearchTool()],  # Now using the improved tool
+    inputs={"topic": "electronics manufacturers", "country": "United States"}  # Example input
 )
+
 
 # Domain and Trustpilot Researcher Task
 domain_and_trustpilot_researcher_task = Task(
     description=(
         "For each **verified supplier** from the search results, conduct additional research using the CombinedTool:\n"
         "\n"
-        "1️⃣ **Domain Age Lookup**\n"
-        "- Extract the domain age from WHOIS records.\n"
+        "1️ **Domain Age Lookup**\n"
+        "- Extract the domain age.\n"
         "- If unavailable, mark as 'Check Manually'.\n"
         "\n"
-        "2️⃣ **Trustpilot Review Check**\n"
+        "2 **Trustpilot Review Check**\n"
         "- Retrieve Trustpilot ratings and extract 'og:title' + 'AggregateRating'.\n"
         "- If no reviews exist, return 'No Trustpilot Data'.\n"
         "\n"
-        "3️⃣ **ZoomInfo Company Lookup**\n"
+        "3️ **ZoomInfo Company Lookup**\n"
         "- Extract details: business name, founding year, revenue, headquarters, phone, and contact email.\n"
         "- Include only legitimate **B2B suppliers** (filter out marketplaces like Amazon, eBay, Alibaba, etc.).\n"
         "- If details are missing, return 'Check Manually'."
@@ -78,9 +85,9 @@ domain_and_trustpilot_researcher_task = Task(
 ai_suppliers_write_task = Task(
     description=(
         "Based on the collected data, generate a detailed supplier report **excluding any non-supplier sources**.\n"
-        "❌ DO NOT include Amazon, Reddit, Alibaba forums, or any marketplace resellers.\n\n"
+        "DO NOT include Amazon, Reddit, Alibaba forums, or any other forums like research papers(etc).\n\n"
         "The report should contain:\n"
-        "✅ A structured breakdown of each **verified supplier**, including:\n"
+        "A structured breakdown of each **verified supplier**, including:\n"
         "- Business overview and key offerings.\n"
         "- Official website link.\n"
         "- Domain age (years since registration).\n"

@@ -27,7 +27,7 @@ class SerperSearchTool(BaseTool):
         "Retrieves verified suppliers, their websites, descriptions, and metadata."
     )
 
-    def _run(self, topic: str, country: str = "United States", max_pages: int = 5):
+    def _run(self, topic: str, country: str = "United States", max_pages: int = 1):
         """
         Searches for verified suppliers using Serper API with multi-page retrieval.
 
