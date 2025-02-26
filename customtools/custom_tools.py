@@ -9,32 +9,23 @@ load_dotenv()
 from scrapfly import ScrapflyClient, ScrapeConfig, ScrapeApiResponse
 # Initialize the Exa tool with your API key
 
-
-import os
 import json
-import requests
-
 import os
-import json
 import requests
+from urllib.parse import urlparse
+
 from crewai.tools import BaseTool
 
-
 class SerperSearchTool(BaseTool):
-    name = "SerperSearchTool"
-    description = (
+    name: str = "SerperSearchTool"  # ✅ Corrected with type annotation
+    description: str = (
         "Fetch up to 5 pages of Google search results using the Serper API. "
         "Retrieves verified suppliers, their websites, descriptions, and metadata."
-    )
+    )  # ✅ Corrected with type annotation
 
-    def _run(self, topic: str, country: str = "United States", max_pages: int = 1):
+    def _run(self, topic: str, country: str, max_pages: int = 1):
         """
         Searches for verified suppliers using Serper API with multi-page retrieval.
-
-        :param topic: The search topic (e.g., 'electronics manufacturers')
-        :param country: The search location (default: 'United States')
-        :param max_pages: The number of pages to fetch (default: 5, max: 5)
-        :return: A JSON list of verified suppliers
         """
         api_key = os.getenv("SERPER_API_KEY")  # Ensure API key is set in environment
         base_url = "https://google.serper.dev/search"
@@ -63,7 +54,7 @@ class SerperSearchTool(BaseTool):
                     search_location = response_data.get("searchParameters", {}).get("location", country)
 
                     # Extract supplier results
-                    results = response_data.get("organic", [])  # Extract organic search results
+                    results = response_data.get("organic", [])
                     for result in results:
                         supplier_data = {
                             "business_name": result.get("title"),
@@ -80,11 +71,6 @@ class SerperSearchTool(BaseTool):
 
         return all_results
 
-
-import json
-import os
-import requests
-from urllib.parse import urlparse
 scrapfly = ScrapflyClient(key=os.getenv("SCRAPFLY_API_KEY"))
 
 # Base configuration for Scrapfly requests
