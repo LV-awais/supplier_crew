@@ -21,7 +21,7 @@ from crewai.tools import BaseTool
 
 
 class SerperSearchTool(BaseTool):
-    name = "Serper Search Tool"
+    name = "SerperSearchTool"
     description = (
         "Fetch up to 5 pages of Google search results using the Serper API. "
         "Retrieves verified suppliers, their websites, descriptions, and metadata."
