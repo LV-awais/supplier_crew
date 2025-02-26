@@ -1,20 +1,25 @@
 from crewai import Task
 from crewai_tools import SerperDevTool
-from customtools.custom_tools import CombinedTool
+from customtools.custom_tools import CombinedTool,SerperSearchTool
 from agents import ai_suppliers_writer, domain_researcher_agent, retrieve_suppliers
 
 # Retrieve Suppliers Task
 retrieve_suppliers_task = Task(
     description=(
-        "Use the Serper tool to search for suppliers related to the input topic. "
-        "Execute multiple search queries using the input topic, for example:\n"
-        "- '{topic} reliable, potentials, top-rated potential distributors {country}'\n"
-        "- '{topic} reliable, potentials, top-rated suppliers {country}'\n"
-        "- '{topic} reliable, potentials, top-rated resellers {country}'\n"
-        "Aggregate the results into a structured dataset including:\n"
-        "- **Supplier name and description except 'Amazon'**\n"
-        "- **Main website link**\n"
-        "- **Any additional metadata or sitelinks**."
+        "Use the Serper tool to search for **verified suppliers** related to the input topic.\n"
+        "Execute multiple search queries using the input topic, ensuring that results:\n"
+        "❌ **EXCLUDE** platforms like Amazon, Reddit, Quora, eBay, Alibaba forums, and other non-supplier sources.\n"
+        "✅ **INCLUDE** verified distributors, wholesalers, manufacturers, and direct suppliers.\n"
+        "\n"
+        "Example queries:\n"
+        "- '{topic} trusted distributors, verified suppliers {country}'\n"
+        "- '{topic} manufacturers, B2B suppliers {country}'\n"
+        "- '{topic} wholesale suppliers, industrial providers {country}'\n"
+        "\n"
+        "Filter and aggregate the results into a structured dataset including:\n"
+        "- **Supplier name (excluding 'Amazon' or other non-suppliers)**\n"
+        "- **Official website link**\n"
+        "- **Relevant metadata like location, industry, and verification badges (if available)**"
     ),
     expected_output=(
         "A structured JSON containing supplier details:\n"
@@ -24,40 +29,42 @@ retrieve_suppliers_task = Task(
         "- `metadata` (if available)."
     ),
     agent=retrieve_suppliers,  # Uses AI Suppliers Retriever agent
-    tools=[SerperDevTool()]  # Uses Serper for searching suppliers
+    tools=[SerperSearchTool()]  # Uses Serper for searching suppliers
 )
 
 # Domain and Trustpilot Researcher Task
 domain_and_trustpilot_researcher_task = Task(
     description=(
-        "Using the CombinedTool, for each supplier from search results, perform the following:\n"
-        "1. Fetch the domain age for the supplier website.\n"
-        "   - Ensure the input URL is properly formatted.\n"
-        "   - If a lookup fails, record a placeholder ('Check Manually').\n"
-        "2. Retrieve Trustpilot review data.\n"
-        "   - Extract 'og:title' and 'AggregateRating' data.\n"
-        "   - If unavailable, return 'Check Manually'.\n"
-        "3. Fetch ZoomInfo company data:\n"
-        "   - Extract fields such as name, URL, founding year, revenue, address, and contact number.\n"
-        "   - Extract email from the 'emailPatterns' field and include it as both 'contact_email' and 'email'.\n"
-        "   - If data is unavailable, record 'Check Manually'."
+        "For each **verified supplier** from the search results, conduct additional research using the CombinedTool:\n"
+        "\n"
+        "1️⃣ **Domain Age Lookup**\n"
+        "- Extract the domain age from WHOIS records.\n"
+        "- If unavailable, mark as 'Check Manually'.\n"
+        "\n"
+        "2️⃣ **Trustpilot Review Check**\n"
+        "- Retrieve Trustpilot ratings and extract 'og:title' + 'AggregateRating'.\n"
+        "- If no reviews exist, return 'No Trustpilot Data'.\n"
+        "\n"
+        "3️⃣ **ZoomInfo Company Lookup**\n"
+        "- Extract details: business name, founding year, revenue, headquarters, phone, and contact email.\n"
+        "- Include only legitimate **B2B suppliers** (filter out marketplaces like Amazon, eBay, Alibaba, etc.).\n"
+        "- If details are missing, return 'Check Manually'."
     ),
     expected_output=(
-        "A JSON dictionary mapping each supplier to its research data, for example:\n"
+        "A structured JSON mapping suppliers to their research data, e.g.:\n"
         "{\n"
         "  'Supplier Name': {\n"
         "    'website_url': 'https://www.example.com',\n"
-        "    'domain_age': '15 years',\n"
-        "    'trustpilot': {'trustpilot_rating': '4.2/5'},\n"
+        "    'domain_age': '12 years',\n"
+        "    'trustpilot': {'trustpilot_rating': '4.6/5'},\n"
         "    'zoominfo': {\n"
-        "      'name': 'Tesla',\n"
-        "      'url': 'www.tesla.com',\n"
-        "      'foundingYear': '2003',\n"
-        "      'revenue': '123',\n"
-        "      'address': '19266 Coastal Hwy, Delaware, US',\n"
-        "      'contact number': '(302) 786-5213',\n"
-        "      'contact_email': 'JSmith@tesla.com',\n"
-        "      'email': 'JSmith@tesla.com'\n"
+        "      'name': 'SupplierX',\n"
+        "      'url': 'www.supplierx.com',\n"
+        "      'foundingYear': '1995',\n"
+        "      'revenue': '$500M',\n"
+        "      'address': '5678 Business Ave, NY, USA',\n"
+        "      'contact_number': '+1-555-987-6543',\n"
+        "      'contact_email': 'info@supplierx.com'\n"
         "    }\n"
         "  }\n"
         "}"
@@ -70,24 +77,24 @@ domain_and_trustpilot_researcher_task = Task(
 # AI Suppliers Report Writing Task
 ai_suppliers_write_task = Task(
     description=(
-        "Review the context you have received and expand each topic into a comprehensive section for a report.\n"
-        "DO NOT include Amazon in the report.\n\n"
-        "The report should include:\n"
-        "- Detailed descriptions of each supplier's business model and offerings.\n"
-        "- Supplier's associated URL.\n"
-        "- Domain age information (years since registration).\n"
-        "- Trustpilot ratings and review insights.\n"
-        "- Complete ZoomInfo details including name, URL, founding year, revenue, contact details, address, and other metadata.\n\n"
-        "Additionally, include a markdown table summarizing key data:\n"
-        "| Supplier Name | URL | Domain Age | Trustpilot Rating | Contact Email | Founding Year | Contact Details | Revenue | Employees | Address |\n"
-        "|--------------|-----|------------|------------------|--------------|--------------|---------------|--------|----------|---------|\n"
-        "| Example Inc. | www.example.com | 10 years | 4.5/5 | contact@example.com | 2010 | (Phone, Email) | $100M | 500 | 1234 Example St, City, Country |"
+        "Based on the collected data, generate a detailed supplier report **excluding any non-supplier sources**.\n"
+        "❌ DO NOT include Amazon, Reddit, Alibaba forums, or any marketplace resellers.\n\n"
+        "The report should contain:\n"
+        "✅ A structured breakdown of each **verified supplier**, including:\n"
+        "- Business overview and key offerings.\n"
+        "- Official website link.\n"
+        "- Domain age (years since registration).\n"
+        "- Trustpilot ratings and review summaries.\n"
+        "- Complete ZoomInfo data: company name, founding year, revenue, address, and contact details.\n\n"
+        "**Include a markdown summary table for quick reference:**\n"
+        "| Supplier Name | URL | Domain Age | Trustpilot Rating | Contact Email | Founding Year | Contact Details | Revenue | Address |\n"
+        "|--------------|-----|------------|------------------|--------------|--------------|---------------|--------|---------|\n"
+        "| SupplierX | www.supplierx.com | 12 years | 4.6/5 | info@supplierx.com | 1995 | +1-555-987-6543 | $500M | 5678 Business Ave, NY, USA |"
     ),
     expected_output=(
-        "A structured markdown report containing:\n"
-        "- Sections covering each supplier with detailed insights.\n"
-        "- Markdown-formatted tables summarizing key data points.\n"
-        "- Clear and readable formatting with headings and bullet points."
+        "A well-formatted markdown report containing:\n"
+        "- **Detailed supplier insights** (no forums, no marketplaces).\n"
+        "- **A structured table summarizing key data.**"
     ),
     agent=ai_suppliers_writer  # Uses AI Suppliers Writer agent
 )

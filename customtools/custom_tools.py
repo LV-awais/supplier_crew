@@ -10,12 +10,75 @@ from scrapfly import ScrapflyClient, ScrapeConfig, ScrapeApiResponse
 # Initialize the Exa tool with your API key
 
 
+import os
+import json
+import requests
+
+import os
+import json
+import requests
+from crewai_tools import BaseTool
 
 
+class SerperSearchTool(BaseTool):
+    name = "Serper Search Tool"
+    description = (
+        "Fetch up to 5 pages of Google search results using the Serper API. "
+        "Retrieves verified suppliers, their websites, descriptions, and metadata."
+    )
 
+    def _run(self, topic: str, country: str = "United States", max_pages: int = 5):
+        """
+        Searches for verified suppliers using Serper API with multi-page retrieval.
 
+        :param topic: The search topic (e.g., 'electronics manufacturers')
+        :param country: The search location (default: 'United States')
+        :param max_pages: The number of pages to fetch (default: 5, max: 5)
+        :return: A JSON list of verified suppliers
+        """
+        api_key = os.getenv("SERPER_API_KEY")  # Ensure API key is set in environment
+        base_url = "https://google.serper.dev/search"
+        headers = {"X-API-KEY": api_key, "Content-Type": "application/json"}
 
+        queries = [
+            f"{topic} trusted distributors, verified suppliers {country}",
+            f"{topic} manufacturers, B2B suppliers {country}",
+            f"{topic} wholesale suppliers, industrial providers {country}"
+        ]
 
+        all_results = []
+        for query in queries:
+            for page in range(max_pages):
+                payload = {
+                    "q": query,
+                    "location": country,
+                    "num": 10,  # Fetch 10 results per page
+                    "start": page * 10  # Adjust start index for pagination
+                }
+
+                response = requests.post(base_url, json=payload, headers=headers)
+
+                if response.status_code == 200:
+                    response_data = response.json()
+                    search_location = response_data.get("searchParameters", {}).get("location", country)
+
+                    # Extract supplier results
+                    results = response_data.get("organic", [])  # Extract organic search results
+                    for result in results:
+                        supplier_data = {
+                            "business_name": result.get("title"),
+                            "url": result.get("link"),
+                            "description": result.get("snippet"),
+                            "metadata": {
+                                "location": search_location,
+                                "sitelinks": [site.get("link") for site in result.get("sitelinks", [])]
+                            }
+                        }
+                        all_results.append(supplier_data)
+                else:
+                    print(f"⚠️ Error fetching page {page + 1} for query '{query}': {response.text}")
+
+        return all_results
 
 
 import json
