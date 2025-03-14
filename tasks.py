@@ -1,6 +1,6 @@
 from crewai import Task
 from crewai_tools import SerperDevTool
-from customtools.custom_tools import CombinedTool
+from customtools.custom_tools import CombinedTool,SerperSearchTool
 from agents import ai_suppliers_writer, domain_researcher_agent, retrieve_suppliers
 
 # Retrieve Suppliers Task
@@ -24,7 +24,7 @@ retrieve_suppliers_task = Task(
         "- `metadata` (if available)."
     ),
     agent=retrieve_suppliers,  # Uses AI Suppliers Retriever agent
-    tools=[SerperDevTool()]  # Uses Serper for searching suppliers
+    tools=[SerperSearchTool()]  # Uses Serper for searching suppliers
 )
 
 # Domain and Trustpilot Researcher Task
