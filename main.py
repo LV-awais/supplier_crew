@@ -1,9 +1,11 @@
 import os
-from crewai import Crew, Process
+from crewai import Crew, Process,LLM
 from agents import retrieve_suppliers, domain_researcher_agent, ai_suppliers_writer
 from tasks import retrieve_suppliers_task, domain_and_trustpilot_researcher_task, ai_suppliers_write_task
 from textwrap import dedent
-
+planningllm = LLM(
+    model="gemini/gemini-2.0-flash"
+)
 class AiSuppliersCrew:
     def __init__(self, inputs):
         self.inputs = inputs
@@ -18,7 +20,9 @@ class AiSuppliersCrew:
         crew = Crew(
             agents=[retrieve_suppliers, domain_researcher_agent, ai_suppliers_writer],
             tasks=[research_task, domain_trustpilot_task, writing_task],
-            process=Process.sequential
+            process=Process.sequential,
+            planning=True,
+            planning_llm=planningllm,
         )
 
         # Execute the crew to carry out the research project
