@@ -109,42 +109,24 @@ with col1:
     st.image(logo_url, width=120)
 with col2:
     st.markdown("<div class='custom-header'><h1>Supplier Acquisition Tool</h1></div>", unsafe_allow_html=True)
-
+if "my_text" not in st.session_state:
+    st.session_state.my_text = ""
+def submit():
+    st.session_state.my_text = st.session_state.widget
+    st.session_state.widget = ""
 # ---------------------------
 # Sidebar: Query Input
 # ---------------------------
 st.sidebar.markdown("<div class='sidebar-header'>Enter Your Search Criteria</div>", unsafe_allow_html=True)
-import streamlit as st
-
-# Initialize session state for user input if not already present
-if "user_query" not in st.session_state:
-    st.session_state["user_query"] = ""
-
-def submit():
-    """Update session state with the input from the text area."""
-    st.session_state["user_query"] = st.session_state["input_widget"]
-    st.session_state["input_widget"] = ""
-
-# Sidebar text area for user input
-st.session_state["input_widget"] = st.sidebar.text_area(
-    "Brand Name",
-    placeholder="Enter the brand or supplier category",
-    height=80,
-    key="input_widget",
-    on_change=submit
-)
-
-# Display the stored user input
-st.sidebar.write("Stored Query:", st.session_state["user_query"])
+user_query = st.sidebar.text_area("Brand Name", placeholder="Enter the brand or supplier category", height=80,key="widget", on_change=submit)
 
 # Reset Button to clear session state
-if st.sidebar.button("Reset"):
-    st.session_state["user_query"] = ""
-    st.session_state["research_done"] = False
-    st.session_state["result"] = ""
-    st.session_state["inputs"] = {}
+reset_button = st.sidebar.button("Reset")
+if reset_button:
+    st.session_state.research_done = False
+    st.session_state.result = ""
+    st.session_state.inputs = {}
     st.rerun()
-
 
 # Full list of countries (alphabetically sorted)
 all_countries = sorted([
@@ -214,10 +196,7 @@ if search_button:
         st.session_state.research_done = True
         status_container.markdown("*✅ Research Complete!*", unsafe_allow_html=True)
 
+# If research has been completed, display the results
 if st.session_state.research_done:
-    st.markdown("### 📌 Supplier Research Report:")
-
-    st.markdown(st.session_state.result, unsafe_allow_html=False)
-
-# This properly renders markdown content
-
+    st.markdown("### 📌 Results of Supplier Research:")
+    st.markdown(st.session_state.result, unsafe_allow_html=True)
