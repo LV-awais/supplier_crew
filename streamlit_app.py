@@ -114,6 +114,8 @@ with col2:
 # Sidebar: Query Input
 # ---------------------------
 st.sidebar.markdown("<div class='sidebar-header'>Enter Your Search Criteria</div>", unsafe_allow_html=True)
+if "user_query" not in st.session_state:
+    st.session_state["user_query"] = ""
 def clear_input():
     st.session_state.user_query = ""
 
