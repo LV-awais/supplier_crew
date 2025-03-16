@@ -122,6 +122,7 @@ if reset_button:
     st.session_state.research_done = False
     st.session_state.result = ""
     st.session_state.inputs = {}
+    st.session_state["user_query"] = ""
     st.rerun()
 
 # Full list of countries (alphabetically sorted)
