@@ -114,7 +114,13 @@ with col2:
 # Sidebar: Query Input
 # ---------------------------
 st.sidebar.markdown("<div class='sidebar-header'>Enter Your Search Criteria</div>", unsafe_allow_html=True)
-user_query = st.sidebar.text_area("Brand Name", placeholder="Enter the brand or supplier category", height=80)
+user_query = st.sidebar.text_area(
+    "Brand Name",
+    value=st.session_state.get("user_query", ""),
+    placeholder="Enter the brand or supplier category",
+    height=80
+)
+
 
 # Reset Button to clear session state
 reset_button = st.sidebar.button("Reset")
