@@ -124,12 +124,14 @@ user_query = st.sidebar.text_area(
 
 # Reset Button to clear session state
 reset_button = st.sidebar.button("Reset")
+
 if reset_button:
-    st.session_state.research_done = False
-    st.session_state.result = ""
-    st.session_state.inputs = {}
-    st.session_state["user_query"] = ""
-    st.rerun()
+    # Clear session state for current user
+    for key in list(st.session_state.keys()):
+        del st.session_state[key]
+
+    st.rerun()  # Refresh UI for the current user
+
 
 # Full list of countries (alphabetically sorted)
 all_countries = sorted([
