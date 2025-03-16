@@ -114,32 +114,37 @@ with col2:
 # Sidebar: Query Input
 # ---------------------------
 st.sidebar.markdown("<div class='sidebar-header'>Enter Your Search Criteria</div>", unsafe_allow_html=True)
+import streamlit as st
+
+# Initialize session state for user input if not already present
 if "user_query" not in st.session_state:
     st.session_state["user_query"] = ""
-def clear_input():
-    st.session_state.user_query = ""
-    st.rerun()
 
-user_query = st.sidebar.text_area(
+def submit():
+    """Update session state with the input from the text area."""
+    st.session_state["user_query"] = st.session_state["input_widget"]
+    st.session_state["input_widget"] = ""
+
+# Sidebar text area for user input
+st.session_state["input_widget"] = st.sidebar.text_area(
     "Brand Name",
-    value=st.session_state.user_query,
     placeholder="Enter the brand or supplier category",
     height=80,
-    key="widget"
+    key="input_widget",
+    on_change=submit
 )
 
-# Reset Button to clear session state and input field
-reset_button = st.sidebar.button("Reset")
+# Display the stored user input
+st.sidebar.write("Stored Query:", st.session_state["user_query"])
 
-if reset_button:
-    # Clear all session state variables
-    for key in list(st.session_state.keys()):
-        del st.session_state[key]
+# Reset Button to clear session state
+if st.sidebar.button("Reset"):
+    st.session_state["user_query"] = ""
+    st.session_state["research_done"] = False
+    st.session_state["result"] = ""
+    st.session_state["inputs"] = {}
+    st.rerun()
 
-    # Reset the input field
-    st.session_state.user_query = ""
-
-    st.rerun()  # Refresh UI for the current user
 
 # Full list of countries (alphabetically sorted)
 all_countries = sorted([
