@@ -114,24 +114,29 @@ with col2:
 # Sidebar: Query Input
 # ---------------------------
 st.sidebar.markdown("<div class='sidebar-header'>Enter Your Search Criteria</div>", unsafe_allow_html=True)
+def clear_input():
+    st.session_state.user_query = ""
+
 user_query = st.sidebar.text_area(
     "Brand Name",
-    value=st.session_state.get("user_query", ""),
+    value=st.session_state.user_query,
     placeholder="Enter the brand or supplier category",
-    height=80
+    height=80,
+    key="widget"
 )
 
-
-# Reset Button to clear session state
+# Reset Button to clear session state and input field
 reset_button = st.sidebar.button("Reset")
 
 if reset_button:
-    # Clear session state for current user
+    # Clear all session state variables
     for key in list(st.session_state.keys()):
         del st.session_state[key]
 
-    st.rerun()  # Refresh UI for the current user
+    # Reset the input field
+    st.session_state.user_query = ""
 
+    st.rerun()  # Refresh UI for the current user
 
 # Full list of countries (alphabetically sorted)
 all_countries = sorted([
