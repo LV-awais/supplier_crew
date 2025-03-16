@@ -118,6 +118,7 @@ if "user_query" not in st.session_state:
     st.session_state["user_query"] = ""
 def clear_input():
     st.session_state.user_query = ""
+    st.rerun()
 
 user_query = st.sidebar.text_area(
     "Brand Name",
