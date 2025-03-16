@@ -195,11 +195,7 @@ if search_button:
 if st.session_state.research_done:
     st.markdown("### 📌 Supplier Research Report:")
 
-    report_markdown = st.session_state.result.get("raw", "")
+    st.markdown(st.session_state.result, unsafe_allow_html=False)
 
-    if report_markdown:
-        st.markdown(report_markdown, unsafe_allow_html=False)
-    else:
-        st.warning("No report available. Please run the search again.")
 # This properly renders markdown content
 
