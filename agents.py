@@ -1,22 +1,25 @@
-from crewai import Agent
+from crewai import Agent, LLM
 from crewai_tools.tools.serper_dev_tool.serper_dev_tool import SerperDevTool
+from customtools.custom_tools import CombinedTool, SerperSearchTool
 
-from customtools.custom_tools import  CombinedTool,SerperSearchTool
+# Define LLM instance
+gemini_llm = LLM(model="gemini/gemini-2.0-flash")
 
 # AI Suppliers Retriever Agent
 retrieve_suppliers = Agent(
     role="{topic} AI Suppliers Retriever",
-    goal="Uncover cutting-edge developments in {topic}",
+    goal="Identify and gather detailed information about the best suppliers for {topic} in {country}.",
     backstory=(
-        "You're a seasoned researcher with a knack for uncovering the latest "
-        "developments in {topic}. Known for your ability to find the most relevant "
-        "information and present it in a clear and concise manner."
+        "You are a skilled market researcher specializing in sourcing high-quality "
+        "suppliers for {topic}. With extensive experience in supplier evaluation, "
+        "you analyze market trends, verify supplier credibility, and ensure "
+        "the best options are presented."
     ),
     memory=True,
     allow_delegation=True,
     verbose=True,
-    llm="gemini/gemini-2.0-flash",
-    tools=[SerperSearchTool()]  # Uses Serper for search
+    llm=gemini_llm,  # Corrected LLM assignment
+    tools=[SerperSearchTool()]  # Ensure this tool is correctly implemented
 )
 
 # Domain Researcher Agent
@@ -24,17 +27,17 @@ domain_researcher_agent = Agent(
     role="Domain Researcher",
     goal=(
         "Retrieve domain age using the DomainAgeTool and Trustpilot review information "
-        "using the CustomTrustpilotTool for the supplier URLs provided by the retrieve_suppliers agent."
+        "for the supplier URLs provided by the retrieve_suppliers agent."
     ),
     backstory=(
         "Renowned for your ability to parse JSON responses from API calls and scraped Trustpilot pages, "
         "you extract critical data such as the domain_age parameter for websites and comprehensive review "
         "insights (ratings, review counts, reputation summaries) to help gauge supplier credibility."
     ),
-    memory="short_term",
+    memory=True,  # Corrected memory parameter
     allow_delegation=True,
     verbose=True,
-    tools=[CombinedTool(result_as_answer=True)]  # Uses CombinedTool for domain + Trustpilot research
+    tools=[CombinedTool(result_as_answer=True)]  # Ensure CombinedTool is correctly implemented
 )
 
 # AI Suppliers Research Writer Agent
@@ -47,7 +50,7 @@ ai_suppliers_writer = Agent(
         "Your reports help **supplier acquisition teams make informed decisions** by providing **strategic insights, "
         "risk assessments, and key recommendations**."
     ),
-    memory="short_term",
+    memory=True,  # Ensuring memory is properly set
     verbose=True,
 )
 

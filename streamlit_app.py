@@ -1,10 +1,12 @@
 __import__('pysqlite3')
 import sys
 sys.modules['sqlite3'] = sys.modules.pop('pysqlite3')
+import sys
 import os
 import streamlit as st
 from main import AiSuppliersCrew
 import time
+
 # ---------------------------
 # Initialize session state variables if they don't exist
 # ---------------------------
@@ -22,12 +24,16 @@ BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 logo_url = os.path.join(BASE_DIR, "search.jpg")
 
 # ---------------------------
-# Environment Setup (API Keys)
+# Environment Setup (API Keys) with error handling
 # ---------------------------
-os.environ["GEMINI_API_KEY"] = st.secrets["GEMINI_API_KEY"]
-os.environ["SERPER_API_KEY"] = st.secrets["SERPER_API_KEY"]
-os.environ["SCRAPFLY_API_KEY"] = st.secrets["SCRAPFLY_API_KEY"]
-os.environ["APIVOID_API_KEY"] = st.secrets["APIVOID_API_KEY"]
+try:
+    os.environ["GEMINI_API_KEY"] = st.secrets["GEMINI_API_KEY"]
+    os.environ["SERPER_API_KEY"] = st.secrets["SERPER_API_KEY"]
+    os.environ["SCRAPFLY_API_KEY"] = st.secrets["SCRAPFLY_API_KEY"]
+    os.environ["APIVOID_API_KEY"] = st.secrets["APIVOID_API_KEY"]
+except Exception as e:
+    st.error("Failed to set environment variables. Please check your secrets configuration.")
+    st.stop()
 
 # ---------------------------
 # Set page config with a custom logo and title
@@ -40,9 +46,9 @@ st.set_page_config(page_title="Supplier Acquisition Tool", layout="wide", page_i
 st.markdown(
     """
     <style>
-        .block-container { 
-            padding-top: 2rem; 
-            padding-bottom: 2rem; 
+        .block-container {
+            padding-top: 2rem;
+            padding-bottom: 2rem;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             color: #333;
         }
@@ -64,9 +70,9 @@ st.markdown(
             font-family: 'Segoe UI', sans-serif;
         }
         .sidebar-header {
-            font-size: 1.3rem; 
-            font-weight: 600; 
-            color: #1a73e8; 
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: #1a73e8;
             margin-bottom: 10px;
         }
         .stButton button {
@@ -109,6 +115,14 @@ with col2:
 # ---------------------------
 st.sidebar.markdown("<div class='sidebar-header'>Enter Your Search Criteria</div>", unsafe_allow_html=True)
 user_query = st.sidebar.text_area("Brand Name", placeholder="Enter the brand or supplier category", height=80)
+
+# Reset Button to clear session state
+reset_button = st.sidebar.button("Reset")
+if reset_button:
+    st.session_state.research_done = False
+    st.session_state.result = ""
+    st.session_state.inputs = {}
+    st.rerun()
 
 # Full list of countries (alphabetically sorted)
 all_countries = sorted([
@@ -154,25 +168,32 @@ search_button = st.sidebar.button("Search")
 status_container = st.empty()
 
 # ---------------------------
+# Helper function to cache the research call
+# ---------------------------
+@st.cache_data(show_spinner=False)
+def run_research(inputs: dict) -> str:
+    # Time-consuming or large API calls can be done here
+    research_crew = AiSuppliersCrew(inputs)
+    return research_crew.run()
+
+# ---------------------------
 # Main Process: Run Supplier Research
 # ---------------------------
 if search_button:
     if not user_query.strip():
         st.error("⚠ Please enter a valid brand or supplier category.")
     else:
-        # Provide immediate feedback to the user
-        status_container.markdown("*🔍 Running Supplier Research...*", unsafe_allow_html=True)
-        # Store the inputs in session state for persistence
         st.session_state.inputs = {"topic": user_query.strip(), "country": selected_country}
-        # Run the research process and store the result in session state
-        research_crew = AiSuppliersCrew(st.session_state.inputs)
-        st.session_state.result = research_crew.run()
+
+        # Display a spinner while research is running
+        with st.spinner("🔍 Running Supplier Research..."):
+            st.session_state.result = run_research(st.session_state.inputs)
+
         st.session_state.research_done = True
-        # Clear the status container and indicate completion
-        status_container.empty()
         status_container.markdown("*✅ Research Complete!*", unsafe_allow_html=True)
 
 # If research has been completed, display the results
 if st.session_state.research_done:
     st.markdown("### 📌 Results of Supplier Research:")
-    st.markdown(str(st.session_state.result), unsafe_allow_html=True,help=None)
+    st.write(st.session_state.result)  # This properly renders markdown content
+

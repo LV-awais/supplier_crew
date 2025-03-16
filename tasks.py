@@ -6,27 +6,31 @@ from agents import ai_suppliers_writer, domain_researcher_agent, retrieve_suppli
 # Retrieve Suppliers Task
 retrieve_suppliers_task = Task(
     description=(
-        "Use the Serper tool to search for suppliers related to the input topic. "
-        "Execute multiple search queries using the input topic, for example:\n"
-        "- '{topic} reliable, potentials, top-rated potential wholesale distributors {country}'\n"
-        "- '{topic} reliable, potentials, top-rated wholesale suppliers {country}'\n"
-        "- '{topic} reliable, potentials, top-rated wholesale retailers {country}'\n"
-        "Aggregate the results into a structured dataset including:\n"
-        "- **Supplier name and description except 'Amazon'**\n"
-        "- **Main website link**\n"
-        "- **Any additional metadata or sitelinks**."
+        "Use the Serper tool to search for verified **wholesale distributors, suppliers, and manufacturers** "
+        "for {topic} in {country}. Focus only on **official supplier directories, verified wholesale distributors, "
+        "and manufacturer websites**. Avoid generic e-commerce platforms and marketplaces.\n\n"
+        "🚫 **EXCLUDE results from:**\n"
+        "- Amazon, Alibaba, eBay, LinkedIn, Quora, Reddit, ResearchGate, ScienceDirect, Wikipedia, blogs, and news articles.\n\n"
+        "🔍 **Search queries should include:**\n"
+        "- 'Official {topic} wholesale distributors {country}'\n"
+        "- '{topic} authorized suppliers and distributors {country}'\n"
+        "- 'Verified {topic} manufacturers {country}'\n"
+        "Extract the results into a structured dataset including:\n"
+        "- **Supplier Name** (Exclude Amazon, Alibaba, etc.)\n"
+        "- **Official Website Link**\n"
+        "- **Business Type** (e.g., Manufacturer, Distributor, Wholesaler)\n"
+        "- **Any Additional Metadata**"
     ),
     expected_output=(
-        "A structured JSON containing supplier details:\n"
+        "A structured JSON containing verified supplier details:\n"
         "- `business_name`\n"
         "- `url`\n"
-        "- `description`\n"
+        "- `business_type` (Manufacturer, Distributor, Wholesaler)\n"
         "- `metadata` (if available)."
     ),
-    agent=retrieve_suppliers,  # Uses AI Suppliers Retriever agent
-    tools=[SerperSearchTool()]  # Uses Serper for searching suppliers
+    agent=retrieve_suppliers,
+    tools=[SerperSearchTool()]  # Uses Serper search with better filtering
 )
-
 # Domain and Trustpilot Researcher Task
 domain_and_trustpilot_researcher_task = Task(
     description=(
@@ -68,30 +72,34 @@ domain_and_trustpilot_researcher_task = Task(
 )
 
 # AI Suppliers Report Writing Task
+from crewai import Task
+from agents import ai_suppliers_writer
+
+# AI Suppliers Report Writing Task
 ai_suppliers_write_task = Task(
     description=(
-        "Review the context you have received and expand each topic into a comprehensive section for a report.\n"
-        "DO NOT include Amazon in the report.\n\n"
-        "❌ **EXCLUDE** platforms like Amazon, Reddit, Quora, eBay, Alibaba forums, and other non-supplier sources.\n"
-        "The report should include:\n"
-        "- Detailed descriptions of each supplier's business model and offerings.\n"
-        "- Supplier's associated URL.\n"
-        "- Domain age information (years since registration).\n"
-        "- Trustpilot ratings and review insights.\n"
-        "- Complete ZoomInfo details including name, URL, founding year, revenue, contact details, address, and other metadata.\n\n"
-        "Additionally, include a markdown table summarizing key data:\n"
-        "| Supplier Name | URL | Domain Age | Trustpilot Rating | Contact Email | Founding Year | Contact Details | Revenue | Employees | Address |\n"
-        "|--------------|-----|------------|------------------|--------------|--------------|---------------|--------|----------|---------|\n"
-        "| Example Inc. | www.example.com | 10 years | 4.5/5 | contact@example.com | 2010 | (Phone, Email) | $100M | 500 | 1234 Example St, City, Country |"
+        "Generate a **comprehensive supplier research report**, ensuring only **verified distributors, "
+        "wholesale suppliers, and manufacturers** are included.\n\n"
+        "🚫 **EXCLUDE**: Amazon, eBay, Alibaba, Reddit, LinkedIn, Quora, blogs, research papers, and unauthorized sellers.\n\n"
+        "✅ **The report should include:**\n"
+        "- Verified supplier name & URL.\n"
+        "- Business type (Distributor, Manufacturer, Wholesaler).\n"
+        "- Domain age verification.\n"
+        "- Trustpilot reviews and ratings.\n"
+        "- Complete ZoomInfo company details (founding year, revenue, contacts, etc.).\n\n"
+        "🔍 **Include a markdown table summarizing key supplier data:**\n"
+        "| Supplier Name | URL | Business Type | Domain Age | Trustpilot Rating | Contact Email | Founding Year | Revenue | Address |\n"
+        "|--------------|-----|--------------|------------|------------------|--------------|--------------|--------|---------|"
     ),
     expected_output=(
-        "A structured markdown report containing:\n"
-        "- Sections covering each supplier with detailed insights.\n"
-        "- Markdown-formatted tables summarizing key data points.\n"
-        "- Clear and readable formatting with headings and bullet points."
+        "A structured markdown report with:\n"
+        "- Supplier profiles and business details.\n"
+        "- Markdown tables summarizing supplier credibility.\n"
+        "- Clear formatting with headers and bullet points."
     ),
-    agent=ai_suppliers_writer  # Uses AI Suppliers Writer agent
+    agent=ai_suppliers_writer
 )
+
 
 # List of tasks
 tasks = [retrieve_suppliers_task, domain_and_trustpilot_researcher_task, ai_suppliers_write_task]
