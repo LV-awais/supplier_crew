@@ -118,7 +118,7 @@ def submit():
 # Sidebar: Query Input
 # ---------------------------
 st.sidebar.markdown("<div class='sidebar-header'>Enter Your Search Criteria</div>", unsafe_allow_html=True)
-user_query = st.sidebar.text_area("Brand Name", placeholder="Enter the brand or supplier category", height=80,key="widget", on_change=submit)
+user_query = st.sidebar.text_area("Brand Name", placeholder="Enter the name of brand", height=80,key="widget", on_change=submit)
 
 # Reset Button to clear session state
 reset_button = st.sidebar.button("Reset")
@@ -184,7 +184,7 @@ def run_research(inputs: dict) -> str:
 # Main Process: Run Supplier Research
 # ---------------------------
 if search_button:
-    if not user_query.strip():
+    if not st.session_state.my_text.strip():
         st.error("⚠ Please enter a valid brand or supplier category.")
     else:
         st.session_state.inputs = {"topic": user_query.strip(), "country": selected_country}
