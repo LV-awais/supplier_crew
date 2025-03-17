@@ -174,7 +174,7 @@ status_container = st.empty()
 # ---------------------------
 # Helper function to cache the research call
 # ---------------------------
-@st.cache_data(show_spinner=False)
+
 def run_research(inputs: dict) -> str:
     # Time-consuming or large API calls can be done here
     research_crew = AiSuppliersCrew(inputs)
