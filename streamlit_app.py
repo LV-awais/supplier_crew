@@ -175,7 +175,7 @@ def run_research(inputs: dict) -> str:
 # Main Process: Run Supplier Research
 # ---------------------------
 if search_button:
-    if not st.session_state.my_text.strip():
+    if not user_query.strip():
         st.error("⚠ Please enter a valid brand or supplier category.")
     else:
         st.session_state.inputs = {"topic": user_query.strip(), "country": selected_country}
