@@ -171,9 +171,6 @@ selected_country = st.sidebar.selectbox("Select Country", options=all_countries,
 search_button = st.sidebar.button("Search")
 status_container = st.empty()
 
-# ---------------------------
-# Helper function to cache the research call
-# ---------------------------
 
 def run_research(inputs: dict) -> str:
     # Time-consuming or large API calls can be done here
@@ -190,7 +187,7 @@ if search_button:
         st.session_state.inputs = {"topic": user_query.strip(), "country": selected_country}
 
         # Display a spinner while research is running
-        with st.spinner("🔍 Running Supplier Research..."):
+        with st.spinner(f"🔍 Running Supplier Research for {st.session_state.my_text.strip()} in {selected_country}"):
             st.session_state.result = run_research(st.session_state.inputs)
 
         st.session_state.research_done = True
