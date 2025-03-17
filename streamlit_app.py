@@ -181,7 +181,7 @@ if search_button:
         st.session_state.inputs = {"topic": user_query.strip(), "country": selected_country}
 
         # Display a spinner while research is running
-        with st.spinner(f"🔍 Running Supplier Research for {st.session_state.my_text.strip()} in {selected_country}"):
+        with st.spinner(f"🔍 Running Supplier Research for {user_query.strip()} in {selected_country}"):
             st.session_state.result = run_research(st.session_state.inputs)
 
         st.session_state.research_done = True
