@@ -39,8 +39,8 @@ class SerperSearchTool(BaseTool):
                 payload = {
                     "q": query,
                     "location": country,
-                    "num": 10,  # Fetch 10 results per page
-                    "page": page * max_pages  # Adjust start index for pagination
+                    "num": 20,  # Fetch 10 results per page
+                    "page": page
                 }
 
                 response = requests.post(base_url, json=payload, headers=headers)
