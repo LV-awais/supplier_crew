@@ -21,8 +21,8 @@ class AiSuppliersCrew:
             agents=[retrieve_suppliers, domain_researcher_agent, ai_suppliers_writer],
             tasks=[research_task, domain_trustpilot_task, writing_task],
             process=Process.sequential,
-            planning=True,
-            planning_llm=planningllm,
+            # planning=True,
+            # planning_llm=planningllm,
         )
 
         # Execute the crew to carry out the research project

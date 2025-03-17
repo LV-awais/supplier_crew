@@ -121,12 +121,6 @@ st.sidebar.markdown("<div class='sidebar-header'>Enter Your Search Criteria</div
 user_query = st.sidebar.text_area("Brand Name", placeholder="Enter the name of brand", height=80,key="widget", on_change=submit)
 
 # Reset Button to clear session state
-reset_button = st.sidebar.button("Reset")
-if reset_button:
-    st.session_state.research_done = False
-    st.session_state.result = ""
-    st.session_state.inputs = {}
-    st.rerun()
 
 # Full list of countries (alphabetically sorted)
 all_countries = sorted([
