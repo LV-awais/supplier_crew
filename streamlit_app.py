@@ -109,16 +109,16 @@ with col1:
     st.image(logo_url, width=120)
 with col2:
     st.markdown("<div class='custom-header'><h1>Supplier Acquisition Tool</h1></div>", unsafe_allow_html=True)
-if "my_text" not in st.session_state:
-    st.session_state.my_text = ""
-def submit():
-    st.session_state.my_text = st.session_state.widget
-    st.session_state.widget = ""
+# if "my_text" not in st.session_state:
+#     st.session_state.my_text = ""
+# def submit():
+#     st.session_state.my_text = st.session_state.widget
+#     st.session_state.widget = ""
 # ---------------------------
 # Sidebar: Query Input
 # ---------------------------
 st.sidebar.markdown("<div class='sidebar-header'>Enter Your Search Criteria</div>", unsafe_allow_html=True)
-user_query = st.sidebar.text_area("Brand Name", placeholder="Enter the name of brand", height=80,key="widget", on_change=submit)
+user_query = st.sidebar.text_area("Brand Name", placeholder="Enter the name of brand", height=80,key="widget")
 
 # Reset Button to clear session state
 
