@@ -1,5 +1,5 @@
 from crewai import Agent
-from .customtools.custom_tools import  SerperSearchTool,CombinedTool
+from customtools.custom_tools import  SerperSearchTool,CombinedTool
 
 # AI Suppliers Retriever Agent
 retrieve_suppliers = Agent(
