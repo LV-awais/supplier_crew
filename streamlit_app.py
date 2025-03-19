@@ -1,10 +1,10 @@
-__import__('pysqlite3')
-import sys
-sys.modules['sqlite3'] = sys.modules.pop('pysqlite3')
+# __import__('pysqlite3')
+# import sys
+# sys.modules['sqlite3'] = sys.modules.pop('pysqlite3')
 import sys
 import os
 import streamlit as st
-from main import AiSuppliersCrew
+# from main import AiSuppliersCrew
 import time
 import requests
 
@@ -27,14 +27,14 @@ logo_url = os.path.join(BASE_DIR, "search.jpg")
 # ---------------------------
 # Environment Setup (API Keys) with error handling
 # ---------------------------
-try:
-    os.environ["GEMINI_API_KEY"] = st.secrets["GEMINI_API_KEY"]
-    os.environ["SERPER_API_KEY"] = st.secrets["SERPER_API_KEY"]
-    os.environ["SCRAPFLY_API_KEY"] = st.secrets["SCRAPFLY_API_KEY"]
-    os.environ["APIVOID_API_KEY"] = st.secrets["APIVOID_API_KEY"]
-except Exception as e:
-    st.error("Failed to set environment variables. Please check your secrets configuration.")
-    st.stop()
+# try:
+#     os.environ["GEMINI_API_KEY"] = st.secrets["GEMINI_API_KEY"]
+#     os.environ["SERPER_API_KEY"] = st.secrets["SERPER_API_KEY"]
+#     os.environ["SCRAPFLY_API_KEY"] = st.secrets["SCRAPFLY_API_KEY"]
+#     os.environ["APIVOID_API_KEY"] = st.secrets["APIVOID_API_KEY"]
+# except Exception as e:
+#     st.error("Failed to set environment variables. Please check your secrets configuration.")
+#     st.stop()
 
 # ---------------------------
 # Set page config with a custom logo and title
@@ -177,17 +177,20 @@ def run_research(inputs: dict) -> str:
     
     # Prepare kickoff payload
     kickoff_payload = {
-        "topic": inputs["topic"],
-        "country": inputs["country"],
+        "inputs": {
+            "topic": str(inputs["topic"]),
+            "country": str(inputs["country"])
+        },
+        "meta": {},
         "conformInputs": True,
-        "taskWebhookUrl": "https://example.com/task-webhook",
-        "stepWebhookUrl": "https://example.com/step-webhook",
-        "crewWebhookUrl": "https://example.com/crew-webhook",
-        "humanInputWebhookUrl": "https://example.com/human-input-webhook",
-        "trainingFilename": f"{inputs['topic'].lower().replace(' ', '_')}_{inputs['country'].lower()}",
+        "taskWebhookUrl": "",
+        "stepWebhookUrl": "",
+        "crewWebhookUrl": "",
+        "humanInputWebhookUrl": "",
+        "trainingFilename": "",
         "generateArtifact": True
     }
-    
+
     try:
         # Step 1: Kickoff the research
         kickoff_response = requests.post(
@@ -197,6 +200,7 @@ def run_research(inputs: dict) -> str:
         )
         kickoff_response.raise_for_status()
         kickoff_id = kickoff_response.json().get("kickoff_id")
+        print(kickoff_id)
         
         if not kickoff_id:
             return "Error: Failed to get kickoff ID from the API"
@@ -206,7 +210,7 @@ def run_research(inputs: dict) -> str:
         attempts = 0
         
         # First wait 4 minutes before checking
-        time.sleep(240)  # 4 minutes = 240 seconds
+        time.sleep(120)  # 4 minutes = 240 seconds
         
         while attempts < max_attempts:
             status_response = requests.get(
