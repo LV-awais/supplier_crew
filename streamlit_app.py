@@ -174,12 +174,14 @@ def run_research(inputs: dict) -> str:
         "Authorization": "Bearer a103d697caa1",
         "Content-Type": "application/json"
     }
-    
+
+    print(inputs["topic"])
+    print(inputs["country"])
     # Prepare kickoff payload
     kickoff_payload = {
         "inputs": {
             "topic": str(inputs["topic"]),
-            "country": str(inputs["country"])
+            "country": str(inputs["country"]),
         },
         "meta": {},
         "conformInputs": True,
@@ -210,7 +212,7 @@ def run_research(inputs: dict) -> str:
         attempts = 0
         
         # First wait 4 minutes before checking
-        time.sleep(120)  # 4 minutes = 240 seconds
+        time.sleep(240)  # 4 minutes = 240 seconds
         
         while attempts < max_attempts:
             status_response = requests.get(
