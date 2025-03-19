@@ -6,6 +6,7 @@ import os
 import streamlit as st
 from main import AiSuppliersCrew
 import time
+import requests
 
 # ---------------------------
 # Initialize session state variables if they don't exist
@@ -167,9 +168,77 @@ status_container = st.empty()
 
 
 def run_research(inputs: dict) -> str:
-    # Time-consuming or large API calls can be done here
-    research_crew = AiSuppliersCrew(inputs)
-    return research_crew.run()
+    # API Configuration
+    base_url = "https://supplier-project-0c676485-9abd-4ec1-805b-a4-3f2d244d.crewai.com"
+    headers = {
+        "Authorization": "Bearer a103d697caa1",
+        "Content-Type": "application/json"
+    }
+    
+    # Prepare kickoff payload
+    kickoff_payload = {
+        "topic": inputs["topic"],
+        "country": inputs["country"],
+        "conformInputs": True,
+        "taskWebhookUrl": "https://example.com/task-webhook",
+        "stepWebhookUrl": "https://example.com/step-webhook",
+        "crewWebhookUrl": "https://example.com/crew-webhook",
+        "humanInputWebhookUrl": "https://example.com/human-input-webhook",
+        "trainingFilename": f"{inputs['topic'].lower().replace(' ', '_')}_{inputs['country'].lower()}",
+        "generateArtifact": True
+    }
+    
+    try:
+        # Step 1: Kickoff the research
+        kickoff_response = requests.post(
+            f"{base_url}/kickoff",
+            headers=headers,
+            json=kickoff_payload
+        )
+        kickoff_response.raise_for_status()
+        kickoff_id = kickoff_response.json().get("kickoff_id")
+        
+        if not kickoff_id:
+            return "Error: Failed to get kickoff ID from the API"
+        
+        # Step 2: Poll for status until SUCCESS
+        max_attempts = 20  # Maximum 20 minutes total (4 min initial + 16 min for subsequent checks)
+        attempts = 0
+        
+        # First wait 4 minutes before checking
+        time.sleep(240)  # 4 minutes = 240 seconds
+        
+        while attempts < max_attempts:
+            status_response = requests.get(
+                f"{base_url}/status/{kickoff_id}",
+                headers=headers
+            )
+            status_response.raise_for_status()
+            status_data = status_response.json()
+            current_state = status_data.get("state")
+            
+            
+            if current_state == "SUCCESS":
+                return status_data.get("result", "No result found in the response")
+            elif current_state == "FAILED":
+                return f"Research failed: {status_data.get('error', 'Unknown error')}"
+            elif current_state == "RUNNING":
+                # Wait 1 minute before next check
+                time.sleep(60)  # 1 minute = 60 seconds
+                attempts += 1
+            else:
+                return f"Unknown state received: {current_state}"
+            
+        return "Error: Research timed out after 20 minutes"
+            # Wait 1 minute before next poll
+          
+            
+        return "Error: Research timed out after 20 minutes"
+        
+    except requests.exceptions.RequestException as e:
+        return f"Error making API request: {str(e)}"
+    except Exception as e:
+        return f"Unexpected error: {str(e)}"
 
 # ---------------------------
 # Main Process: Run Supplier Research
